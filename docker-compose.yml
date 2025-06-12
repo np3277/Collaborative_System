@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Service
+  db:
+    image: postgres:14-alpine
+    container_name: collaborative-form-system-db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432" # Expose PostgreSQL port
+    volumes:
+      # Optional: Mount a volume for persistent data, so data isn't lost if container is removed
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck: # Healthcheck for the database to ensure it's ready
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache/Pub-Sub Service
+  redis:
+    image: redis:6-alpine
+    container_name: collaborative-form-system-redis
+    ports:
+      - "6379:6379" # Expose Redis port
+    volumes:
+      # Optional: Mount a volume for persistent data (e.g., AOF persistence if enabled)
+      - redis_data:/data
+    healthcheck: # Healthcheck for Redis
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Node.js Backend Application Service
+  app:
+    build:
+      context: . # Build from the current directory (where Dockerfile is)
+      dockerfile: Dockerfile
+    container_name: collaborative-form-system-app
+    ports:
+      - "8000:3000" # <--- CHANGED: Expose Node.js app on host port 8000
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: db          # Hostname for database, matches service name in docker-compose
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis    # Hostname for Redis, matches service name in docker-compose
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+    # Ensure app starts only after db and redis are healthy
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      # Mount the local source code into the container for live reloading during development
+      # Remove this for production builds if you prefer a smaller image size after build
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./node_modules:/app/node_modules # To ensure node_modules are in sync if developing locally
+      - ./.env:/app/.env # Mount .env file directly
+    command: npm start # Command to run the application
+
+# Define Docker volumes for persistent data
+volumes:
+  db_data:
+  redis_data:
