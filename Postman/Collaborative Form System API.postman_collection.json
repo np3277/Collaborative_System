@@ -1,0 +1,373 @@
+{
+	"info": {
+		"_postman_id": "1c1b2118-d23f-46ed-abf1-94d90a3cf810",
+		"name": "Collaborative Form System API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43286706",
+		"_collection_link": "https://www.postman.com/spaceflight-astronaut-52114111/collaborative-forms-project/collection/43286706-1c1b2118-d23f-46ed-abf1-94d90a3cf810?action=share&source=collection_link&creator=43286706"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response.message && response.message.includes(\"User registered successfully.\")) {\r",
+									"    console.log(\"Admin user registered successfully. Proceed to Login Admin.\");\r",
+									"    // You would usually follow this by logging in to get the token, but we'll do that in the next request.\r",
+									"} else {\r",
+									"    console.error(\"Admin registration failed:\", response.message || JSON.stringify(response));\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"postman_admin\",\r\n    \"password\": \"postman_password\",\r\n    \"role\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response.token) {\r",
+									"    pm.environment.set(\"adminToken\", response.token); // Store token in environment\r",
+									"    pm.environment.set(\"adminUserId\", response.user.id); // Store admin's ID\r",
+									"    console.log(\"Admin token captured:\", pm.environment.get(\"adminToken\"));\r",
+									"    console.log(\"Admin User ID captured:\", pm.environment.get(\"adminUserId\"));\r",
+									"} else {\r",
+									"    console.error(\"Admin login failed:\", response.message || JSON.stringify(response));\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"postman_admin\",\r\n    \"password\": \"postman_password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response.message && response.message.includes(\"User registered successfully.\")) {\r",
+									"    console.log(\"Regular user registered successfully. Proceed to Login User.\");\r",
+									"} else {\r",
+									"    console.error(\"User registration failed:\", response.message || JSON.stringify(response));\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"postman_user\",\r\n    \"password\": \"user_password\",\r\n    \"role\": \"user\"\r\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response.token) {\r",
+									"    pm.environment.set(\"userToken\", response.token); // Store user token\r",
+									"    pm.environment.set(\"userId\", response.user.id); // Store user's ID\r",
+									"    console.log(\"User token captured:\", pm.environment.get(\"userToken\"));\r",
+									"    console.log(\"User ID captured:\", pm.environment.get(\"userId\"));\r",
+									"} else {\r",
+									"    console.error(\"User login failed:\", response.message || JSON.stringify(response));\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"postman_user\",\r\n    \"password\": \"user_password\"\r\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Forms (Admin)",
+			"item": [
+				{
+					"name": "Create New Form",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response.form && response.form.shareCode) {\r",
+									"    pm.environment.set(\"currentFormShareCode\", response.form.shareCode);\r",
+									"    pm.environment.set(\"currentFormId\", response.form.id);\r",
+									"    console.log(\"Form created. Share Code captured:\", pm.environment.get(\"currentFormShareCode\"));\r",
+									"    console.log(\"Form ID captured:\", pm.environment.get(\"currentFormId\"));\r",
+									"} else {\r",
+									"    console.error(\"Form creation failed:\", response.message || JSON.stringify(response));\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "adminToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Postman Demo Form\",\r\n  \"description\": \"A collaborative form created via Postman for testing.\",\r\n  \"fields\": [\r\n    { \"type\": \"text\", \"name\": \"form_field_1\", \"label\": \"Text Field 1\", \"required\": true },\r\n    { \"type\": \"number\", \"name\": \"form_field_2\", \"label\": \"Number Field\", \"required\": false },\r\n    { \"type\": \"dropdown\", \"name\": \"form_field_3\", \"label\": \"Dropdown\", \"options\": [\"Option A\", \"Option B\"], \"required\": true }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/forms",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"forms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Forms (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "adminToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/forms",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"forms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Form by ID (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "adminToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/forms/{{currentFormId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"forms",
+								"{{currentFormId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Forms (User)",
+			"item": [
+				{
+					"name": "Join Form by Share Code (User)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "adminToken",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/forms/join/{{currentFormShareCode}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"forms",
+								"join",
+								"{{currentFormShareCode}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
