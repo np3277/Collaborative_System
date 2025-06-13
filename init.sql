@@ -1,13 +1,8 @@
--- Create the uuid-ossp extension for generating UUIDs
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Drop tables if they exist to allow clean re-runs for development
--- Order matters for foreign key constraints
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP TABLE IF EXISTS "form_responses" CASCADE; -- CASCADE ensures dependent objects (like FKs) are dropped
 DROP TABLE IF EXISTS "forms" CASCADE;
 DROP TABLE IF EXISTS "users" CASCADE;
-
--- Table for Users
 CREATE TABLE "users" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "username" VARCHAR(255) UNIQUE NOT NULL,
@@ -16,8 +11,6 @@ CREATE TABLE "users" (
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
--- Table for Forms
 CREATE TABLE "forms" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "admin_id" UUID NOT NULL, -- The user (admin) who created the form
@@ -29,13 +22,7 @@ CREATE TABLE "forms" (
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE CASCADE
 );
-
--- Index on share_code for quick lookups on the forms table
 CREATE INDEX "idx_forms_share_code" ON "forms"("share_code");
-
-
--- Table for Form Responses
--- This table stores the actual collaborative data for each user for a specific form.
 CREATE TABLE "form_responses" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "form_id" UUID NOT NULL, -- The form this response belongs to
@@ -50,9 +37,6 @@ CREATE TABLE "form_responses" (
     FOREIGN KEY ("last_edited_by_user_id") REFERENCES "users"("id") ON DELETE SET NULL, -- Foreign key for the last editor
     UNIQUE ("form_id", "user_id") -- Ensures each user has only ONE response entry per form
 );
-
-
--- Function to update updated_at timestamps automatically on row updates
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -60,8 +44,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Triggers for automatic updated_at timestamp updates on relevant tables
 CREATE TRIGGER update_users_updated_at
 BEFORE UPDATE ON "users"
 FOR EACH ROW
