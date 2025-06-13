@@ -5,11 +5,6 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 const Form = require('../models/Form');
 const FormResponse = require('../models/FormResponse');
 
-/**
- * @route POST /api/forms
- * @description Creates a new form. Requires admin role.
- * @access Private (Admin)
- */
 router.post('/', authenticateToken, authorizeRoles(['admin']), async (req, res) => { // Removed '/forms'
     try {
         const { name, description, fields } = req.body;
@@ -50,12 +45,6 @@ router.post('/', authenticateToken, authorizeRoles(['admin']), async (req, res) 
         res.status(500).json({ message: 'Server error creating form.' });
     }
 });
-
-/**
- * @route GET /api/forms
- * @description Get all forms created by the current admin. Requires admin role.
- * @access Private (Admin)
- */
 router.get('/', authenticateToken, authorizeRoles(['admin']), async (req, res) => { // Removed '/forms'
     try {
         if (req.user.role !== 'admin') {
@@ -69,12 +58,6 @@ router.get('/', authenticateToken, authorizeRoles(['admin']), async (req, res) =
         res.status(500).json({ message: 'Server error fetching forms.' });
     }
 });
-
-/**
- * @route GET /api/forms/:formId
- * @description Get a specific form definition. Requires admin role (or possibly user if joining).
- * @access Private (Admin, or via share code for user)
- */
 router.get('/:formId', authenticateToken, authorizeRoles(['admin']), async (req, res) => { // Removed '/forms'
     try {
         const { formId } = req.params;
@@ -91,12 +74,6 @@ router.get('/:formId', authenticateToken, authorizeRoles(['admin']), async (req,
         res.status(500).json({ message: 'Server error fetching form.' });
     }
 });
-
-/**
- * @route GET /api/forms/join/:shareCode
- * @description Get form definition and current response data for a user joining.
- * @access Private (Authenticated User)
- */
 router.get('/join/:shareCode', authenticateToken, async (req, res) => { // Removed '/forms'
     try {
         const { shareCode } = req.params;
